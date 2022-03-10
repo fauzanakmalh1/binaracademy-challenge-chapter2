@@ -58,7 +58,18 @@ const getInfoPenjualan = (dataPenjualan) => {
     );
     persentaseKeuntungan = Math.round((totalKeuntungan / totalModal) * 100);
 
-    let terbanyakDijual = dataPenjualan.reduce((prev, curr) =>
+    const bukuTerbanyakDijual = dataPenjualan.reduce((prev, curr) =>
+      prev.totalTerjual > curr.totalTerjual ? prev : curr
+    );
+
+    const penulisTerbanyak = Array.from(
+      dataPenjualan.reduce(
+        (newObject, { penulis, totalTerjual }) =>
+          newObject.set(penulis, (newObject.get(penulis) || 0) + totalTerjual),
+        new Map()
+      ),
+      ([penulis, totalTerjual]) => ({ penulis, totalTerjual })
+    ).reduce((prev, curr) =>
       prev.totalTerjual > curr.totalTerjual ? prev : curr
     );
 
@@ -66,8 +77,8 @@ const getInfoPenjualan = (dataPenjualan) => {
       totalKeuntungan: convertToRupiah(totalKeuntungan),
       totalModal: convertToRupiah(totalModal),
       persentaseKeuntungan: `${persentaseKeuntungan}%`,
-      produkBukuTerlaris: terbanyakDijual.namaProduk,
-      penulisTerlaris: terbanyakDijual.penulis,
+      produkBukuTerlaris: bukuTerbanyakDijual.namaProduk,
+      penulisTerlaris: penulisTerbanyak.penulis,
     };
   }
   return `Error: Data penjualan must array of object`;
