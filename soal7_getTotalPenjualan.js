@@ -26,15 +26,10 @@ const dataPenjualanPakAldi = [
 ];
 
 const getTotalPenjualan = (dataPenjualan) => {
-  if (dataPenjualan == null) {
-    return `Error: Bro where is the parameter?`;
-  } else if (typeof dataPenjualan == "object") {
-    return dataPenjualan
-      .map((item) => item.totalTerjual)
-      .reduce((prev, curr) => prev + curr, 0);
-  } else {
-    return `Error: Data penjualan must array of object`;
-  }
+  if (dataPenjualan == null) return `Error: Bro where is the parameter?`;
+  if (typeof dataPenjualan == "object")
+    return dataPenjualan.reduce((prev, curr) => prev + curr.totalTerjual, 0);
+  return `Error: Data penjualan must array of object`;
 };
 
 console.log(getTotalPenjualan(dataPenjualanPakAldi));

@@ -38,26 +38,30 @@ const dataPenjualanNovel = [
 ];
 
 const convertToRupiah = (angka) => {
-  const format = angka.toString().split("").reverse().join("");
-  const convert = format.match(/\d{1,3}/g);
-  return "Rp. " + convert.join(".").split("").reverse().join("");
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(angka);
 };
 
 const getInfoPenjualan = (dataPenjualan) => {
-  if (dataPenjualan == null) {
-    return `Error: Bro where is the parameter?`;
-  } else if (typeof dataPenjualan == "object") {
+  if (dataPenjualan == null) return `Error: Bro where is the parameter?`;
+  if (typeof dataPenjualan == "object") {
     totalKeuntungan = dataPenjualan
-      .map((item) => item.hargaJual * item.totalTerjual)
+      .map((item) => (item.hargaJual - item.hargaBeli) * item.totalTerjual)
       .reduce((prev, curr) => prev + curr, 0);
-    totalModal = dataPenjualan
-      .map((item) => item.hargaBeli * (item.totalTerjual + item.sisaStok))
-      .reduce((prev, curr) => prev + curr, 0);
-    persentaseKeuntungan = Math.round((totalModal / totalKeuntungan) * 100);
+    totalModal = dataPenjualan.reduce(
+      (prev, curr) =>
+        prev + curr.hargaBeli * (curr.totalTerjual + curr.sisaStok),
+      0
+    );
+    persentaseKeuntungan = Math.round((totalKeuntungan / totalModal) * 100);
 
     let terbanyakDijual = dataPenjualan.reduce((prev, curr) =>
       prev.totalTerjual > curr.totalTerjual ? prev : curr
     );
+
     return {
       totalKeuntungan: convertToRupiah(totalKeuntungan),
       totalModal: convertToRupiah(totalModal),
@@ -65,9 +69,8 @@ const getInfoPenjualan = (dataPenjualan) => {
       produkBukuTerlaris: terbanyakDijual.namaProduk,
       penulisTerlaris: terbanyakDijual.penulis,
     };
-  } else {
-    return `Error: Data penjualan must array of object`;
   }
+  return `Error: Data penjualan must array of object`;
 };
 
 console.log(getInfoPenjualan(dataPenjualanNovel));
